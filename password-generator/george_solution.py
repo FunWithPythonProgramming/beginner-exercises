@@ -49,7 +49,7 @@ def create_password():
             password += random.choice(numbers)
         if need_symbols in ("y","yes"):
             password += random.choice(symbols)
-    data_folder.append(password)
+    data_folder.append(password[:sub_num])
     return password[:sub_num]
 
 
