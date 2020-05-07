@@ -23,42 +23,33 @@ import string
 def create_password():
     lower_letters = tuple(string.ascii_lowercase)
     upper_letters = tuple(string.ascii_uppercase)
-    numbers = [str(number+1) for number in range(10)]
-    symbols = ["!", "@", "#", "$", "%"]
+    numbers = [str(number) for number in range(10)] # 0..9
+    symbols = tuple(string.punctuation)
+
+    application_name = input("What application is this password for? ").lower().strip()
 
     while True:
         try:
             password_length = int(input("How long should the password be? (must be greater than or equal to 4) "))
-            if password_length < 4:
-                while True:
-                    password_length = int(input("Password (must be greater than or equal to 4) "))
-                    if password_length < 4:
-                        continue
-                    else:
-                        break
-                if password_length >= 4:
-                    break
-            else:
+            if password_length >= 4:
                 break
+            else:
+                raise ValueError("Password Length Mus Be >= 4")
         except ValueError as error:
-            print("Input must be a whole number, please do not type any strings/characters\n")
+            print("Input must be a whole number and >= 4, please do not type any strings/characters\n")
+    
+    condition_count = 0
 
-    if password_length > 3:
-    # check if it actually is >= 4
-        condition_count = 0
-
-        while True:
-            need_letters = input("letters? (y/n) ")
-            if need_letters.lower().strip() not in ('y', 'n'):
-                print("please type 'y' or 'n' when prompted with question again")
-            else:
-                break
+    while True:
+        need_letters = input("letters? (y/n) ")
+        if need_letters.lower().strip() not in ('y', 'n'):
+            print("please type 'y' or 'n' when prompted with question again")
+            continue
         if need_letters.strip().lower() == 'y':
             while True:
                 need_upper_letters = input("upper? (y/n) ")
                 if need_upper_letters.lower().strip() not in ('y', 'n'):
                     print("please type 'y' or 'n' when prompted with question again")
-
                 else:
                     break
 
@@ -103,7 +94,7 @@ def create_password():
         # if this isn't a multiple of 4, this will be wrong
         password = ""
 
-        for number in range(password_length):
+        for number in range(min_of_each):
             if need_letters.strip().lower() == "y":
 
                 if need_upper_letters.strip().strip() == "y":
@@ -118,28 +109,79 @@ def create_password():
             if need_symbols.strip().strip() == "y":
                 password += random.choice(symbols)
 
-        return password
+        return (application_name, password)
 
 def number_of_passwords():
     while True:
         try:
-            number_of_passwords = int(input("How many passwords should I create? "))
-            return number_of_passwords
+            return int(input("How many passwords should I create? "))
         except ValueError as error:
             print("Please return a whole number or you will be stuck in an infinite loop\n")
 
-def main():
+def create_passwords():
     num_password = number_of_passwords()
-    pwd = ""
+    passwords = {}
     for _ in range(num_password):
-        print(create_password())
-        pwd += create_password()
-    return pwd
+        application_name, password = create_password()
+        print(application_name, password)
+        passwords[application_name] = password
+    return passwords
 
-    
-with open("password.txt", 'w') as pwd_txt:
-    passwords = main()
-    print(passwords)
-    for line in passwords:
-        data = pwd_txt.write(line)
+def query_password(password_dict):
+    if not password_dict:
+        print("No passwords to search through!")
+    else:
+        while True:
+            print("Application List: ")
+            for application_name in password_dict:
+                print(application_name)
+            application_name = input("Which application password would you like? ").lower().strip()
+            password = password_dict.get(application_name)
+            if password:
+                print(password)
+                break
+            else:
+                print("This application doesn't exist, try again")
 
+
+def export_passwords(password_dict):
+    file_name = input("What file should I export this to? ")
+    with open(file_name, 'w') as password_txt:
+        for application in password_dict:
+            data = password_txt.write(f"{application}, {password_dict[application]}\n")
+
+
+def import_passwords()
+    file_name = input("What file should I import from? ")
+
+
+def main():
+    passwords = {}
+    while True:
+        print("Options: \n1. Import Passwords\n2. Create Passwords\n3. Query Password\n4. Export Passwords\n5. Exit")
+        command = 0
+        while command not in (1, 2, 3, 4, 5):
+            command = validate_integer_input("What would you like to do: ")
+        
+        if command == 1:
+            import_password(file_name)
+        elif command == 2:
+            passwords.update(create_passwords())
+        elif command == 3:
+            query_password(passwords)
+        elif command == 4:
+            export_passwords(passwords)
+        else:
+            break
+
+
+def validate_integer_input(question):
+    while True:
+        try:
+            return int(input(question))
+        except ValueError:
+            print("Please enter a valid integer")
+
+
+if __name__ == "__main__":
+    main()
