@@ -19,6 +19,8 @@ The goal of this exercise is to create a new random password that can be used as
 
 import random
 import string
+import json
+import os
 
 def create_password():
     lower_letters = tuple(string.ascii_lowercase)
@@ -123,7 +125,6 @@ def create_passwords():
     passwords = {}
     for _ in range(num_password):
         application_name, password = create_password()
-        print(application_name, password)
         passwords[application_name] = password
     return passwords
 
@@ -145,14 +146,29 @@ def query_password(password_dict):
 
 
 def export_passwords(password_dict):
-    file_name = input("What file should I export this to? ")
-    with open(file_name, 'w') as password_txt:
-        for application in password_dict:
-            data = password_txt.write(f"{application}, {password_dict[application]}\n")
+    while True:
+        file_name = input("What file should I export this to? (must end in .json)")
+        if file_name.endswith(".json"):
+            with open(file_name, 'w') as output_file:
+                json.dump(password_dict, output_file)
+            break
+        else:
+            print("Invalid file, it must end in .json")
 
 
-def import_passwords()
-    file_name = input("What file should I import from? ")
+def import_passwords():
+    files_in_directory = os.listdir()
+    valid_files = []
+    for file in files_in_directory:
+        if file.endswith(".json"):
+            valid_files.append(file)
+
+    while True:
+        file_name = input(f"What file should I import from (must end in .json)? \nValid Options: {valid_files}\n")
+        if file_name in valid_files:
+            with open(file_name, 'r') as input_file:
+                passwords_dict = json.load(input_file)
+                return passwords_dict
 
 
 def main():
@@ -164,7 +180,7 @@ def main():
             command = validate_integer_input("What would you like to do: ")
         
         if command == 1:
-            import_password(file_name)
+            passwords.update(import_passwords())
         elif command == 2:
             passwords.update(create_passwords())
         elif command == 3:
