@@ -2,17 +2,24 @@
 
 import random
 
+def parse_int_from_input(input_question):
+    while True:
+        try:
+            return int(input(input_question))
+        except ValueError:
+            print("Pick A Valid Integer")
+
 def play_game(max_number):
     random_number = random.randint(0, max_number)
-    guess = int(input(f"Guess A Number Between 0 and {max_number}: "))
+    guess = parse_int_from_input(f"Guess A Number Between 0 and {max_number}: ")
     count = 1
 
     while True:
         if guess > random_number:
-            guess = int(input("Too High! Guess Again: "))
+            guess = parse_int_from_input("Too High! Guess Again: ")
             count += 1
         elif guess < random_number:
-            guess = int(input("Too Low! Guess Again: "))
+            guess = parse_int_from_input("Too Low! Guess Again: ")
             count += 1 
         else:
             print(f"You Got It In {count} Guesses!")
@@ -22,7 +29,7 @@ def main():
     guesses = []
     play_again = True
     while play_again:
-        max_number = int(input("Pick a max number: "))
+        max_number = parse_int_from_input("Pick a max number: ")
         guesses.append(play_game(max_number))
 
         play_again_input = input("Do you want to play again (y/n)? ").lower()
